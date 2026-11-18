@@ -1,6 +1,6 @@
 # Vending Machine
 
-A PHP vending-machine application built for the code exercise in `Vending Machine - PHP (6).pdf`. It covers product management, inventory, purchasing, session authentication with Admin/User roles, PHPUnit coverage and a JWT-protected REST API.
+A PHP vending-machine application built for a take-home code exercise. It covers product management, inventory, purchasing, session authentication with Admin/User roles, PHPUnit coverage and a JWT-protected REST API.
 
 The app is deliberately built on vanilla PHP 8.3 with a small in-house MVC layer — no framework — so the requested fundamentals (PDO connection, attribute routing, DI, RBAC, validation, mocking) are visible in the source rather than delegated to a framework.
 
