@@ -1,0 +1,21 @@
+# Local development overlay. Docker Compose loads this file automatically, so
+# `docker compose up` serves the working tree and picks up edits on the next
+# request without a rebuild. The base docker-compose.yml still describes a
+# self-contained image (`docker compose -f docker-compose.yml up` to test it).
+#
+# Deliberately not mounted:
+#   vendor/        installed in the image from composer.lock
+#   .env           the container is configured through `environment:`
+#   composer.*     changing dependencies needs a rebuild
+#   Dockerfile, docker/  baked into the image
+services:
+  app:
+    volumes:
+      - ./public:/var/www/html/public
+      - ./src:/var/www/html/src
+      - ./bootstrap:/var/www/html/bootstrap
+      - ./routes:/var/www/html/routes
+      - ./database:/var/www/html/database
+      - ./bin:/var/www/html/bin
+      - ./tests:/var/www/html/tests
+      - ./storage:/var/www/html/storage

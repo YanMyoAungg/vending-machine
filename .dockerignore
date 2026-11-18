@@ -1,0 +1,10 @@
+vendor
+.git
+.gitignore
+.env
+.env.prod
+.superpowers
+docs
+.phpunit.cache
+storage/logs/*.log
+.DS_Store

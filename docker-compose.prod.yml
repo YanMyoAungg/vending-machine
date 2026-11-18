@@ -1,0 +1,78 @@
+# Production stack for the Lightsail demo host.
+# Run from the project root on the server:
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --no-build
+#
+# The app joins the existing LMS proxy network so the nginx vhost can reach it
+# by name; no application port is published to the internet.
+name: vending
+
+services:
+  app:
+    build:
+      context: .
+    image: vending-machine-app:prod
+    container_name: vending-app
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      DB_HOST: vending-db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-vending}
+      DB_USERNAME: ${DB_USERNAME:-vending}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env.prod}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.prod}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:80"
+    networks:
+      - default
+      - lms
+    mem_limit: 176m
+    memswap_limit: 512m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: mysql:8.4
+    container_name: vending-db
+    restart: unless-stopped
+    command:
+      - --innodb-buffer-pool-size=48M
+      - --performance-schema=OFF
+      - --max-connections=20
+      - --table-open-cache=64
+      - --innodb-log-buffer-size=8M
+      - --skip-name-resolve
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env.prod}
+      MYSQL_DATABASE: ${DB_DATABASE:-vending}
+      MYSQL_USER: ${DB_USERNAME:-vending}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env.prod}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    mem_limit: 240m
+    memswap_limit: 768m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  db-data:
+
+networks:
+  lms:
+    external: true
+    name: lms-api_lms-network

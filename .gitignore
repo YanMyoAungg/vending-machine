@@ -1,0 +1,8 @@
+/vendor/
+.env
+.phpunit.cache/
+storage/logs/*.log
+.DS_Store
+.superpowers/
+.env.prod
+*.pdf
